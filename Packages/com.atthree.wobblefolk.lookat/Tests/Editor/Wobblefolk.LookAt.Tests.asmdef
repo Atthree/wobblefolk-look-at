@@ -3,6 +3,7 @@
     "rootNamespace": "Wobblefolk.LookAt.Tests",
     "references": [
         "Wobblefolk.LookAt",
+        "Wobblefolk.LookAt.Editor",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
