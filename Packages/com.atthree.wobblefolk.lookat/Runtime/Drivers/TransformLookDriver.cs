@@ -24,7 +24,8 @@ namespace Wobblefolk.LookAt
         public Transform leftEye;
         public Transform rightEye;
 
-        [Tooltip("Drive the body links (torso to head). Turn off when another driver moves them, e.g. a joint driver.")]
+        [Tooltip("Drive the body links (torso to head). Turn off when another driver moves them, e.g. a joint driver; " +
+                 "the eyes are then aimed absolutely, so they stay on target while a physical head wobbles.")]
         public bool driveBody = true;
         [Tooltip("Drive the eyes.")]
         public bool driveEyes = true;
@@ -35,6 +36,8 @@ namespace Wobblefolk.LookAt
             public Quaternion source;
             public Quaternion written;
             public bool hasWritten;
+            public Quaternion restInCharacter;
+            public bool hasRest;
         }
 
         readonly BoneRecord[] records = new BoneRecord[6];
@@ -80,7 +83,26 @@ namespace Wobblefolk.LookAt
 
             YawPitch angles = LookDriverMath.EyeAngles(solver, frame, eye.position, isLeft);
             Quaternion delta = LookDriverMath.WorldDelta(angles, frame.characterRotation, frame.weight);
-            Rotate(index, delta * Quaternion.Inverse(headDelta));
+            if (driveBody)
+            {
+                Rotate(index, delta * Quaternion.Inverse(headDelta));
+                return;
+            }
+
+            // The head is moved by physics and may lag: set the eye's world rotation directly from its rest pose in
+            // the character frame, instead of relying on where the head should be.
+            ref BoneRecord record = ref records[index];
+            if (!record.hasRest)
+            {
+                record.restInCharacter = Quaternion.Inverse(frame.characterRotation) * eye.rotation;
+                record.hasRest = true;
+            }
+
+            record.source = eye.localRotation;
+            Quaternion world = delta * frame.characterRotation * record.restInCharacter;
+            eye.rotation = frame.weight >= 1f ? world : Quaternion.Slerp(eye.rotation, world, frame.weight);
+            record.written = eye.localRotation;
+            record.hasWritten = true;
         }
 
         void Bind()
