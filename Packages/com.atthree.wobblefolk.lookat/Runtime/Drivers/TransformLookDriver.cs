@@ -42,11 +42,13 @@ namespace Wobblefolk.LookAt
         const int LeftEyeIndex = 4;
         const int RightEyeIndex = 5;
 
-        public void ApplyLook(LookSolver solver, Quaternion characterRotation, float weight)
+        public void ApplyLook(LookSolver solver, in LookFrame frame)
         {
             Bind();
             RestoreUnchangedBones();
 
+            Quaternion characterRotation = frame.characterRotation;
+            float weight = frame.weight;
             Quaternion applied = Quaternion.identity;
             if (driveBody)
             {
@@ -64,13 +66,21 @@ namespace Wobblefolk.LookAt
                 applied = LookDriverMath.WorldDelta(solver.GetAccumulated(LookSegment.Head), characterRotation, weight);
             }
 
-            if (driveEyes)
+            if (driveEyes && frame.driveEyes)
             {
-                Quaternion eyes = LookDriverMath.WorldDelta(solver.GetAccumulated(LookSegment.Eyes), characterRotation, weight);
-                Quaternion eyeDelta = eyes * Quaternion.Inverse(applied);
-                if (records[LeftEyeIndex].bone != null) Rotate(LeftEyeIndex, eyeDelta);
-                if (records[RightEyeIndex].bone != null) Rotate(RightEyeIndex, eyeDelta);
+                RotateEye(LeftEyeIndex, solver, frame, applied, true);
+                RotateEye(RightEyeIndex, solver, frame, applied, false);
             }
+        }
+
+        void RotateEye(int index, LookSolver solver, in LookFrame frame, Quaternion headDelta, bool isLeft)
+        {
+            Transform eye = records[index].bone;
+            if (eye == null) return;
+
+            YawPitch angles = LookDriverMath.EyeAngles(solver, frame, eye.position, isLeft);
+            Quaternion delta = LookDriverMath.WorldDelta(angles, frame.characterRotation, frame.weight);
+            Rotate(index, delta * Quaternion.Inverse(headDelta));
         }
 
         void Bind()
@@ -126,6 +136,13 @@ namespace Wobblefolk.LookAt
         void OnDisable()
         {
             RestorePose();
+        }
+
+        void OnDrawGizmosSelected()
+        {
+            Gizmos.color = new Color(0.2f, 0.9f, 1f);
+            if (leftEye != null) Gizmos.DrawRay(leftEye.position, leftEye.forward * 0.5f);
+            if (rightEye != null) Gizmos.DrawRay(rightEye.position, rightEye.forward * 0.5f);
         }
     }
 }

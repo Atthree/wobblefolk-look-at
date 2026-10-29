@@ -63,6 +63,59 @@ namespace Wobblefolk.LookAt
         [Range(0f, 180f)] public float exitAngle = 100f;
     }
 
+    [Serializable]
+    public sealed class EyeSettings
+    {
+        [Tooltip("How much each eye aims at the target from its own position (0 = both eyes parallel, 1 = fully " +
+                 "converged). Makes eyes cross slightly on near targets.")]
+        [Range(0f, 1f)] public float convergence = 1f;
+        [Tooltip("Furthest an eye turns towards the nose, relative to the head (degrees).")]
+        [Range(0f, 90f)] public float maxInnerYaw = 25f;
+        [Tooltip("Furthest an eye turns away from the nose, relative to the head (degrees).")]
+        [Range(0f, 90f)] public float maxOuterYaw = 35f;
+    }
+
+    [Serializable]
+    public sealed class SaccadeSettings
+    {
+        public bool enabled = true;
+        [Tooltip("Random time between small eye jumps (s).")]
+        [Min(0.01f)] public float minInterval = 0.4f;
+        [Min(0.01f)] public float maxInterval = 1.8f;
+        [Tooltip("Size of the small jumps around the target (degrees).")]
+        [Min(0f)] public float minAmplitude = 0.5f;
+        [Min(0f)] public float maxAmplitude = 2.5f;
+        [Tooltip("Once the gaze has rested this long, larger glances away become possible (s).")]
+        [Min(0f)] public float idleTime = 2f;
+        [Tooltip("Chance that a jump is a larger glance away while idle (0..1).")]
+        [Range(0f, 1f)] public float idleGlanceChance = 0.2f;
+        [Tooltip("Size of an idle glance away (degrees).")]
+        [Min(0f)] public float idleGlanceAmplitude = 10f;
+        [Tooltip("How quickly the eyes jump to a new offset (s). Saccades are very fast.")]
+        [Min(0f)] public float jumpTime = 0.02f;
+        [Tooltip("A target moving faster than this (degrees/s) counts as not resting.")]
+        [Min(0f)] public float restingSpeed = 15f;
+    }
+
+    [Serializable]
+    public sealed class BlinkSettings
+    {
+        public bool enabled = true;
+        [Tooltip("Random time between blinks (s).")]
+        [Min(0.05f)] public float minInterval = 2.5f;
+        [Min(0.05f)] public float maxInterval = 6f;
+        [Tooltip("Time to close the lids (s).")]
+        [Min(0.01f)] public float closeTime = 0.06f;
+        [Tooltip("Time the lids stay closed (s).")]
+        [Min(0f)] public float holdTime = 0.03f;
+        [Tooltip("Time to open the lids again (s).")]
+        [Min(0.01f)] public float openTime = 0.1f;
+        [Tooltip("Chance that a blink is immediately followed by a second one (0..1).")]
+        [Range(0f, 1f)] public float doubleBlinkChance = 0.1f;
+        [Tooltip("A gaze jump larger than this triggers a blink (degrees). 0 = off.")]
+        [Min(0f)] public float blinkOnGazeShift = 35f;
+    }
+
     /// <summary>Settings of the look chain: per-link weights, limits, speeds and delays, and what to do with targets behind.</summary>
     [CreateAssetMenu(menuName = "Wobblefolk/Look Profile", fileName = "LookProfile")]
     public sealed class LookProfile : ScriptableObject
@@ -79,6 +132,13 @@ namespace Wobblefolk.LookAt
         [Range(0f, 360f)] public float maxBodyYaw = 120f;
 
         public BehindSettings behind = new BehindSettings();
+
+        [Header("Eyes")]
+        public EyeSettings eyeDetails = new EyeSettings();
+        [Tooltip("Small random eye jumps. Needs an EyeBehaviour on the character.")]
+        public SaccadeSettings saccades = new SaccadeSettings();
+        [Tooltip("Blinking. Needs an EyeBehaviour with eyelids on the character.")]
+        public BlinkSettings blinks = new BlinkSettings();
 
         [ContextMenu("Apply Preset/Realistic")]
         void ApplyRealistic() => LookProfilePresets.Apply(this, LookPreset.Realistic);
