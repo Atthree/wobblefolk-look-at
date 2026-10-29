@@ -80,6 +80,15 @@ namespace Wobblefolk.LookAt
 
         public BehindSettings behind = new BehindSettings();
 
+        [ContextMenu("Apply Preset/Realistic")]
+        void ApplyRealistic() => LookProfilePresets.Apply(this, LookPreset.Realistic);
+
+        [ContextMenu("Apply Preset/Robotic Snappy")]
+        void ApplyRoboticSnappy() => LookProfilePresets.Apply(this, LookPreset.RoboticSnappy);
+
+        [ContextMenu("Apply Preset/Sluggish")]
+        void ApplySluggish() => LookProfilePresets.Apply(this, LookPreset.Sluggish);
+
         public LookSegmentSettings Get(LookSegment segment)
         {
             switch (segment)
