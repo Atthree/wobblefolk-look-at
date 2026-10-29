@@ -1,0 +1,30 @@
+{
+    "name": "Wobblefolk.LookAt.Tests.Runtime",
+    "rootNamespace": "Wobblefolk.LookAt.Tests",
+    "references": [
+        "Wobblefolk.LookAt",
+        "Wobblefolk.LookAt.ActiveRagdoll",
+        "Wobblefolk.Ragdoll",
+        "UnityEngine.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "WOBBLEFOLK_ACTIVE_RAGDOLL"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.wobblefolk.active-ragdoll",
+            "expression": "0.1.0",
+            "define": "WOBBLEFOLK_ACTIVE_RAGDOLL"
+        }
+    ],
+    "noEngineReferences": false
+}

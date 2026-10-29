@@ -199,6 +199,17 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.wobblefolk.active-ragdoll": {
+      "version": "https://github.com/Atthree/wobblefolk-active-ragdoll.git?path=/Packages/com.wobblefolk.active-ragdoll",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.modules.animation": "1.0.0",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.inputsystem": "1.20.0"
+      },
+      "hash": "7e09a2ff5a6d31dffe3ef1084aebead228ab8bfb"
+    },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
       "depth": 0,
