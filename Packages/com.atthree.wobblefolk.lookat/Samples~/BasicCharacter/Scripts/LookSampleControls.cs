@@ -7,7 +7,7 @@ namespace Wobblefolk.LookAt.Samples
 {
     /// <summary>
     /// Sample controls: 1 / 2 / 3 switch presets, I toggles mouse vs. interest points, L locks the gaze on a random
-    /// object for two seconds. Profiles can also be edited live in the Inspector during Play mode.
+    /// object for two seconds, B blinks. Profiles can also be edited live in the Inspector during Play mode.
     /// </summary>
     public sealed class LookSampleControls : MonoBehaviour
     {
@@ -46,6 +46,11 @@ namespace Wobblefolk.LookAt.Samples
             {
                 controller.LookAt(lockTargets[Random.Range(0, lockTargets.Length)], lockDuration);
             }
+
+            if (PressedBlink() && controller.EyeBehaviour != null)
+            {
+                controller.EyeBehaviour.Blink();
+            }
         }
 
         void ApplyPreset(int index)
@@ -59,7 +64,7 @@ namespace Wobblefolk.LookAt.Samples
         {
             string preset = presets.Length > 0 && presets[presetIndex] != null ? presets[presetIndex].name : "-";
             GUI.Label(new Rect(12, 10, 640, 22), $"Profile: {preset}   Target: {(interestMode ? "interest points" : "mouse")}   {(controller.HasOverride ? "(locked)" : "")}   {status}");
-            GUI.Label(new Rect(12, 30, 640, 22), "1 / 2 / 3 presets    I mouse / interest points    L look at a random object for 2 s");
+            GUI.Label(new Rect(12, 30, 720, 22), "1 / 2 / 3 presets    I mouse / interest points    L look at a random object for 2 s    B blink");
         }
 
 #if ENABLE_INPUT_SYSTEM
@@ -71,10 +76,12 @@ namespace Wobblefolk.LookAt.Samples
 
         static bool PressedInterest() => Keyboard.current != null && Keyboard.current.iKey.wasPressedThisFrame;
         static bool PressedLock() => Keyboard.current != null && Keyboard.current.lKey.wasPressedThisFrame;
+        static bool PressedBlink() => Keyboard.current != null && Keyboard.current.bKey.wasPressedThisFrame;
 #else
         static bool Pressed(int number) => Input.GetKeyDown(KeyCode.Alpha1 + number) || Input.GetKeyDown(KeyCode.Keypad1 + number);
         static bool PressedInterest() => Input.GetKeyDown(KeyCode.I);
         static bool PressedLock() => Input.GetKeyDown(KeyCode.L);
+        static bool PressedBlink() => Input.GetKeyDown(KeyCode.B);
 #endif
     }
 }

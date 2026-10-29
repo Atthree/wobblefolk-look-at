@@ -36,6 +36,14 @@ namespace Wobblefolk.LookAt
         [Tooltip("Blend with the unmodified pose: 0 = no look at all, 1 = full look.")]
         [Range(0f, 1f)] public float weight = 1f;
 
+        [Header("Eyes")]
+        [Tooltip("Saccades and blinking. Empty = looked up on this object; none = eyes without them.")]
+        [SerializeField] EyeBehaviour eyeBehaviour;
+        [Tooltip("Eyes, saccades and blinks are skipped beyond this distance from the LOD camera (m). 0 = never skipped.")]
+        [Min(0f)] public float eyeLodDistance = 0f;
+        [Tooltip("Camera for the eye LOD distance. Empty = the main camera.")]
+        public Camera lodCamera;
+
         [Header("Events")]
         [Tooltip("The gaze counts as on target within this angle (degrees).")]
         [Range(0f, 45f)] public float onTargetAngle = 4f;
@@ -51,6 +59,8 @@ namespace Wobblefolk.LookAt
         bool hasOverride;
         bool overrideIsTransform;
         bool onTarget;
+        bool hasPreviousRequest;
+        YawPitch previousRequest;
 
         public LookProfile Profile
         {
@@ -79,6 +89,11 @@ namespace Wobblefolk.LookAt
         public bool IsOnTarget => onTarget;
         public bool HasOverride => hasOverride;
 
+        /// <summary>False while the eyes are skipped by the distance LOD.</summary>
+        public bool EyesActive { get; private set; } = true;
+
+        public EyeBehaviour EyeBehaviour => eyeBehaviour;
+
         internal void Configure(LookProfile lookProfile, LookTargetProvider provider, Transform root, Transform origin)
         {
             Profile = lookProfile;
@@ -90,6 +105,7 @@ namespace Wobblefolk.LookAt
         void Awake()
         {
             RefreshDrivers();
+            if (eyeBehaviour == null) eyeBehaviour = GetComponent<EyeBehaviour>();
         }
 
         /// <summary>Re-collects the drivers on this object, e.g. after adding one at runtime.</summary>
@@ -150,13 +166,33 @@ namespace Wobblefolk.LookAt
             Vector3 localDirection = HasTarget ? Quaternion.Inverse(root.rotation) * (target - origin) : Vector3.forward;
             look.Update(localDirection, HasTarget, deltaTime);
 
+            // How far the requested look direction jumped this frame drives saccade resting and gaze-shift blinks.
+            float shift = HasTarget && hasPreviousRequest ? LookMath.AngleBetween(previousRequest, look.RequestedTarget) : 0f;
+            hasPreviousRequest = HasTarget;
+            previousRequest = look.RequestedTarget;
+
+            EyesActive = IsWithinEyeLod(origin);
+            if (eyeBehaviour == null) eyeBehaviour = GetComponent<EyeBehaviour>();
+            bool eyesAlive = EyesActive && eyeBehaviour != null && eyeBehaviour.enabled;
+            float speed = deltaTime > 0f ? shift / deltaTime : 0f;
+            YawPitch eyeOffset = eyesAlive ? eyeBehaviour.Tick(profile, deltaTime, speed, shift) : default;
+
+            var frame = new LookFrame(root.rotation, target, HasTarget, weight, eyeOffset, EyesActive);
             for (int i = 0; i < drivers.Count; i++)
             {
                 if (drivers[i] is Behaviour behaviour && !behaviour.enabled) continue;
-                drivers[i].ApplyLook(look, root.rotation, weight);
+                drivers[i].ApplyLook(look, frame);
             }
 
+            if (eyeBehaviour != null && eyeBehaviour.enabled) eyeBehaviour.ApplyLids(eyesAlive);
             UpdateEvents(look);
+        }
+
+        bool IsWithinEyeLod(Vector3 origin)
+        {
+            if (eyeLodDistance <= 0f) return true;
+            Camera cam = lodCamera != null ? lodCamera : Camera.main;
+            return cam == null || (cam.transform.position - origin).sqrMagnitude <= eyeLodDistance * eyeLodDistance;
         }
 
         bool TryGetTarget(Vector3 origin, Transform root, out Vector3 target)
@@ -204,6 +240,65 @@ namespace Wobblefolk.LookAt
             {
                 if (drivers[i] is TransformLookDriver transformDriver) transformDriver.RestorePose();
             }
+        }
+
+        void OnDrawGizmosSelected()
+        {
+            if (profile == null) return;
+            Transform root = CharacterRoot;
+            Vector3 origin = LookOrigin.position;
+            float length = HasTarget ? Mathf.Max(0.5f, Vector3.Distance(origin, CurrentTarget)) : 1.5f;
+
+            if (Application.isPlaying || solver != null)
+            {
+                if (HasTarget)
+                {
+                    Gizmos.color = new Color(1f, 0.85f, 0.2f);
+                    Gizmos.DrawLine(origin, CurrentTarget);
+                    Gizmos.DrawWireSphere(CurrentTarget, 0.06f);
+                }
+
+                Gizmos.color = onTarget ? new Color(0.3f, 1f, 0.4f) : new Color(1f, 0.4f, 0.3f);
+                Gizmos.DrawRay(origin, root.rotation * LookMath.ToDirection(Solver.Gaze) * length);
+            }
+
+            // Reach of the whole chain (outer cone) and of the head alone (inner cone).
+            float upReach = 0f, downReach = 0f;
+            for (int i = 0; i < LookSegments.Count; i++)
+            {
+                LookSegmentSettings s = profile.Get((LookSegment)i);
+                upReach += s.maxPitchUp;
+                downReach += s.maxPitchDown;
+            }
+
+            DrawLimitCone(origin, root.rotation, profile.MaxReachYaw, Mathf.Min(upReach, 89f), Mathf.Min(downReach, 89f), 0.6f,
+                new Color(1f, 1f, 1f, 0.35f));
+            DrawLimitCone(origin, root.rotation, profile.head.maxYaw, profile.head.maxPitchUp, profile.head.maxPitchDown, 0.45f,
+                new Color(0.4f, 0.8f, 1f, 0.6f));
+        }
+
+        static void DrawLimitCone(Vector3 origin, Quaternion rotation, float yaw, float up, float down, float radius, Color color)
+        {
+            const int Steps = 16;
+            Gizmos.color = color;
+            Vector3 Point(float y, float p) => origin + rotation * LookMath.ToDirection(new YawPitch(y, p)) * radius;
+
+            for (int i = 0; i < Steps; i++)
+            {
+                float a = Mathf.Lerp(-yaw, yaw, i / (float)Steps);
+                float b = Mathf.Lerp(-yaw, yaw, (i + 1) / (float)Steps);
+                Gizmos.DrawLine(Point(a, up), Point(b, up));
+                Gizmos.DrawLine(Point(a, -down), Point(b, -down));
+                float c = Mathf.Lerp(-down, up, i / (float)Steps);
+                float d = Mathf.Lerp(-down, up, (i + 1) / (float)Steps);
+                Gizmos.DrawLine(Point(-yaw, c), Point(-yaw, d));
+                Gizmos.DrawLine(Point(yaw, c), Point(yaw, d));
+            }
+
+            Gizmos.DrawLine(origin, Point(-yaw, up));
+            Gizmos.DrawLine(origin, Point(yaw, up));
+            Gizmos.DrawLine(origin, Point(-yaw, -down));
+            Gizmos.DrawLine(origin, Point(yaw, -down));
         }
     }
 }
