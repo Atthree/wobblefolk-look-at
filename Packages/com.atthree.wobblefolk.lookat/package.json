@@ -1,0 +1,25 @@
+{
+  "name": "com.atthree.wobblefolk.lookat",
+  "version": "0.1.0",
+  "displayName": "Wobblefolk Look At",
+  "description": "Layered procedural look-at for characters: eyes lead, head follows, shoulders and torso catch up. Works on animated characters (Transform driver) and physics active ragdolls (ConfigurableJoint driver).",
+  "unity": "6000.3",
+  "keywords": [
+    "look at",
+    "head look",
+    "eye movement",
+    "procedural animation",
+    "active ragdoll"
+  ],
+  "author": {
+    "name": "Abdulkadir Tiryaki"
+  },
+  "license": "MIT",
+  "documentationUrl": "https://github.com/Atthree/wobblefolk-look-at#readme",
+  "licensesUrl": "https://github.com/Atthree/wobblefolk-look-at/blob/main/LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Atthree/wobblefolk-look-at.git"
+  },
+  "dependencies": {}
+}
