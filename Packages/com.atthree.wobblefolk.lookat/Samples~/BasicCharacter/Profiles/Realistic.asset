@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56e94e72be1e4004da80fce79c7f9565, type: 3}
+  m_Name: Realistic
+  m_EditorClassIdentifier: Wobblefolk.LookAt::Wobblefolk.LookAt.LookProfile
+  torso:
+    weight: 0.3
+    engageAngle: 45
+    maxYaw: 20
+    maxPitchUp: 5
+    maxPitchDown: 10
+    smoothTime: 0.45
+    maxSpeed: 0
+    delay: 0.25
+  upperChest:
+    weight: 0.35
+    engageAngle: 30
+    maxYaw: 25
+    maxPitchUp: 10
+    maxPitchDown: 15
+    smoothTime: 0.35
+    maxSpeed: 0
+    delay: 0.15
+  neck:
+    weight: 0.4
+    engageAngle: 10
+    maxYaw: 30
+    maxPitchUp: 15
+    maxPitchDown: 20
+    smoothTime: 0.2
+    maxSpeed: 0
+    delay: 0.06
+  head:
+    weight: 0.6
+    engageAngle: 5
+    maxYaw: 60
+    maxPitchUp: 35
+    maxPitchDown: 40
+    smoothTime: 0.15
+    maxSpeed: 0
+    delay: 0.05
+  eyes:
+    weight: 1
+    engageAngle: 0
+    maxYaw: 35
+    maxPitchUp: 25
+    maxPitchDown: 30
+    smoothTime: 0.04
+    maxSpeed: 0
+    delay: 0
+  maxBodyYaw: 120
+  behind:
+    behaviour: 0
+    enterAngle: 115
+    exitAngle: 100

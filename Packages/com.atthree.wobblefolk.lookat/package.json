@@ -21,5 +21,12 @@
     "type": "git",
     "url": "https://github.com/Atthree/wobblefolk-look-at.git"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "samples": [
+    {
+      "displayName": "Basic Character",
+      "description": "Primitive character with a look chain (torso, chest, neck, head, eyes) following the mouse. Keys 1/2/3 switch presets, I toggles interest points, L locks the gaze on a random object. Uses the active render pipeline default shader.",
+      "path": "Samples~/BasicCharacter"
+    }
+  ]
 }

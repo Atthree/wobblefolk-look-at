@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56e94e72be1e4004da80fce79c7f9565, type: 3}
+  m_Name: RoboticSnappy
+  m_EditorClassIdentifier: Wobblefolk.LookAt::Wobblefolk.LookAt.LookProfile
+  torso:
+    weight: 0.2
+    engageAngle: 60
+    maxYaw: 15
+    maxPitchUp: 0
+    maxPitchDown: 5
+    smoothTime: 0.08
+    maxSpeed: 0
+    delay: 0
+  upperChest:
+    weight: 0.3
+    engageAngle: 40
+    maxYaw: 20
+    maxPitchUp: 5
+    maxPitchDown: 10
+    smoothTime: 0.06
+    maxSpeed: 0
+    delay: 0
+  neck:
+    weight: 0.5
+    engageAngle: 0
+    maxYaw: 35
+    maxPitchUp: 20
+    maxPitchDown: 25
+    smoothTime: 0.05
+    maxSpeed: 0
+    delay: 0
+  head:
+    weight: 1
+    engageAngle: 0
+    maxYaw: 70
+    maxPitchUp: 40
+    maxPitchDown: 45
+    smoothTime: 0.04
+    maxSpeed: 0
+    delay: 0
+  eyes:
+    weight: 1
+    engageAngle: 0
+    maxYaw: 20
+    maxPitchUp: 15
+    maxPitchDown: 15
+    smoothTime: 0.02
+    maxSpeed: 0
+    delay: 0
+  maxBodyYaw: 120
+  behind:
+    behaviour: 0
+    enterAngle: 115
+    exitAngle: 100
