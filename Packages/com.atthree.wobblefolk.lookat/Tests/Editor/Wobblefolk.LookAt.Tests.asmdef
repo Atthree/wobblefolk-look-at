@@ -1,0 +1,24 @@
+{
+    "name": "Wobblefolk.LookAt.Tests",
+    "rootNamespace": "Wobblefolk.LookAt.Tests",
+    "references": [
+        "Wobblefolk.LookAt",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
