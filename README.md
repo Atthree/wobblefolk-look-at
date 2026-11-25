@@ -634,3 +634,8 @@ adımlarında etki eder. Görünen gövdelerde Rigidbody interpolasyonu kullan.
 
 **MIT Lisansı** ile yayınlanmıştır (`LICENSE.md`). Bütün kod sıfırdan yazılmıştır. Fikir için incelenen açık kaynak
 projeler `THIRD_PARTY_NOTICES.md` dosyasında listelenmiştir.
+
+---
+
+🤖 *This project was developed with the help of AI tools.*  
+🤖 *Bu proje yapay zekâ araçlarının yardımıyla geliştirilmiştir.*
